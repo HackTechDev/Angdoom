@@ -1,6 +1,5 @@
 OBJS=main.o generate.o misc.o vectorize.o
 BIN=angdoom
-LIBS=-lggi
 
 CFLAGS += -g
 

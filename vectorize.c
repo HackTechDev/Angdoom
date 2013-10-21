@@ -5,8 +5,6 @@
 #include "defines.h"
 #include "externs.h"
 
-#include <ggi/ggi.h>
-
 #include "wadstructs.h"
 
 int cave_sector_map[DUNGEON_HGT][DUNGEON_WID];
@@ -25,51 +23,49 @@ Sidedef *sidedefs=NULL;
 Sector *sectors=NULL;
 int vertex_idx[DUNGEON_HGT][DUNGEON_WID];
 
+// 640x480
+// 21 * 30 => 630
+// 32 * 15 => 480
+
+#define LEVELX 630
+#define LEVELY 480
+
+int level[LEVELX][LEVELY]; 
+
 void visualize() 
 {
 	int x, y;
 	
-	ggi_visual_t vis;
-	ggi_color color;
-	ggi_pixel pix;
-	
-	ggiInit();
-	vis=ggiOpen(NULL);
+    for(x = 0; x < LEVELX; x++) {
+        for(y = 0; y < LEVELY; y++) {
+            level[x][y] = 0;
+        }
+    }
 
-	ggiSetGraphMode(vis, 640, 480, 640, 480, GT_AUTO);
-
-	color.r=0xFFFF;
-	color.g=0xFFFF;
-	color.b=0xFFFF;
-
-	pix=ggiMapColor(vis, &color);
-	ggiSetGCForeground(vis, pix);
-
-
-	// ROCK1 for walls
-	// RROCK13 for floor/ceiling
-	// 1 tile = 64 units square
-	// tunnel hight should be 64 units
-	// light level 64 is nice and dark...
 
 	for(y=0; y < DUNGEON_HGT - 1 ; y++) {
 		for(x=0; x < DUNGEON_WID - 1; x++) {
 			if(cave_sector_map[y][x] != cave_sector_map[y][x+1]) {
-				ggiDrawVLine(vis, x*3 + 3, y*3, 3);
+                level[x*3 + 3][y*3] = 1;
+                level[x*3 + 3][(y*3) + 1] = 1;
+                level[x*3 + 3][(y*3) + 2] = 1;
 			}
 
 			if(cave_sector_map[y][x] != cave_sector_map[y+1][x]) {
-				ggiDrawHLine(vis, x*3, y*3 + 3, 3);				
+                level[x*3][y*3+3] = 1;
+                level[(x*3) + 1][y*3+3] = 1;
+                level[(x*3) + 2][y*3+3] = 1;
 			}			
 		}
 	}
 
-	ggiFlush(vis);
+    for(y = 0; y < LEVELY; y++) {
+        for(x = 0; x < LEVELX; x++) {
+            printf("%d", level[x][y]);
+        }
+        printf("\n");
+    }
 
-	ggiGetc(vis);
-
-	ggiClose(vis);
-	ggiExit();
 }
 
 void add_thing(Thing* t) 
@@ -472,44 +468,15 @@ void vectorize()
 		}
 	}
 
-	printf("optimizing");
 	fflush(stdout);
 
 	start_ld_counter=linedef_counter;
 	do {
 		old_ld_counter=linedef_counter;
 		optimize_linedefs();
-		printf(".");
 		fflush(stdout);
 	} while(old_ld_counter != linedef_counter);
 
-	printf("\n");
-
-	/*
-	printf("Vertexes are %i, Linedefs %i, Sidedefs %i, Sectors %i\n",
-		   sizeof(Vertex), sizeof(Linedef), sizeof(Sidedef), sizeof(Sector));
-	*/
-	printf("Figured %i max linedefs\n", max_linedefs);
-	printf("Generated %i vertices\n", vertex_counter);
-	printf("Generated %i linedefs (optimized to %i)\n", start_ld_counter+1, linedef_counter+1);
-	printf("Generated %i sidedefs\n", sidedef_counter+1);
-	printf("Generated %i sectors\n", sector_counter+1);
-
-	/*
-	for(i=0; i < linedef_counter; i++) {
-		if(vertexes[linedefs[i].from_vertex].y <= 128) {
-			printf("linedef %i goes from vertex %i (%i, %i) to vertex %i (%i, %i)\n", i, 
-				   linedefs[i].from_vertex,
-				   vertexes[linedefs[i].from_vertex].x, 
-				   vertexes[linedefs[i].from_vertex].y,
-				   linedefs[i].to_vertex,
-				   vertexes[linedefs[i].to_vertex].x,
-				   vertexes[linedefs[i].to_vertex].y);
-		}
-	}
-	*/
-
-	write_wad();
 
 	visualize();
 }

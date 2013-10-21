@@ -48,7 +48,6 @@ void add_thing(Thing* t);
 s16b player_place(int y, int x) 
 {
 	Thing t;
-	printf("player at %i %i\n", y, x);
 	
 	t.x = x * 64 + 32;
 	t.y = y * 64 + 32;
@@ -61,7 +60,6 @@ s16b player_place(int y, int x)
 
 void place_trap(int y, int x) 
 {
-	printf("trap at %i %i\n", y, x);
 
 	cave_set_feat(y, x, FEAT_TRAP_HEAD);
 	cave_sector_map[y][x]=++sector_counter;
@@ -115,7 +113,6 @@ void place_object(int y, int x, bool good, bool great)
 	t.angle = rand_int(360);
 	t.type = fun_items[rand_int(13)];
 
-	printf("object of type %i at (%i, %i)\n", t.type, x, y);
 
 	t.options = 0x7;
 
@@ -124,7 +121,6 @@ void place_object(int y, int x, bool good, bool great)
 
 void place_gold(int y, int x)
 {
-	printf("money at %i %i\n", y, x);
 }
 
 /* monster thing types */
@@ -163,7 +159,6 @@ bool place_monster(int y, int x, bool slp, bool grp)
 							REVENANT,
 							PAIN_ELEMENTAL};
 
-	printf("monster at %i %i\n", y, x);
 
 	t.x = x * 64 + 32;
 	t.y = y * 64 + 32;
@@ -178,7 +173,6 @@ bool place_monster(int y, int x, bool slp, bool grp)
 
 bool place_monster_aux(int y, int x, int r_idx, bool slp, bool grp) 
 {
-	printf("monster type %i at %i %i\n", r_idx, y, x);
 }
 
 /*
